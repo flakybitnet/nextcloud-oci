@@ -4,7 +4,7 @@ FROM nextcloud:${NEXTCLOUD_VERSION}-apache
 RUN set -ex; \
     \
     apt-get update; \
-    apt-get install -y --no-install-recommends ffmpeg procps smbclient; \
+    apt-get install -y --no-install-recommends ffmpeg ghostscript procps smbclient; \
     rm -rf /var/lib/apt/lists/*
 
 RUN set -ex; \
