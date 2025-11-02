@@ -1,14 +1,12 @@
 ARG NEXTCLOUD_VERSION
-FROM nextcloud:${NEXTCLOUD_VERSION}-apache
+FROM public.ecr.aws/docker/library/nextcloud:${NEXTCLOUD_VERSION}-apache
 
 RUN set -ex; \
-    \
     apt-get update; \
     apt-get install -y --no-install-recommends ffmpeg ghostscript procps smbclient; \
     rm -rf /var/lib/apt/lists/*
 
 RUN set -ex; \
-    \
     savedAptMark="$(apt-mark showmanual)"; \
     \
     apt-get update; \
