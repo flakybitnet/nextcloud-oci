@@ -3,7 +3,7 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '31.0.10'
+  NEXTCLOUD_VERSION: '31.0.11'
   IMAGE_NAME: 'server'
 
 images:
