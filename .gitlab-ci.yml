@@ -3,7 +3,7 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '32.0.6'
+  NEXTCLOUD_VERSION: '32.0.8'
   IMAGE_NAME: 'server'
 
 images:
@@ -12,7 +12,7 @@ images:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - when: on_success
-  image: quay.io/buildah/stable:v1.42.2
+  image: quay.io/buildah/stable:v1.43.0
   variables:
     STORAGE_DRIVER: 'vfs'
   script:
@@ -45,7 +45,7 @@ mirror-image-github:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.21.0-fb1
+  image: public.ecr.aws/flakybitnet/skopeo:1.22.0-fb1
   variables:
     REGISTRY: ghcr.io
     IMAGE: flakybitnet/nextcloud-server
@@ -59,7 +59,7 @@ mirror-image-quay:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.21.0-fb1
+  image: public.ecr.aws/flakybitnet/skopeo:1.22.0-fb1
   variables:
     REGISTRY: quay.io
     IMAGE: flakybitnet/nextcloud-server
@@ -73,7 +73,7 @@ mirror-image-amazon:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.21.0-fb1
+  image: public.ecr.aws/flakybitnet/skopeo:1.22.0-fb1
   variables:
     REGISTRY: public.ecr.aws
     IMAGE: flakybitnet/nextcloud/server
