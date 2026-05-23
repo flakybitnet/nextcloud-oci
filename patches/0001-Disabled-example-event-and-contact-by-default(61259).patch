@@ -1,0 +1,24 @@
+diff --git a/apps/dav/lib/Service/ExampleContactService.php b/apps/dav/lib/Service/ExampleContactService.php
+--- a/apps/dav/lib/Service/ExampleContactService.php
++++ b/apps/dav/lib/Service/ExampleContactService.php
+@@ -33,7 +33,7 @@ class ExampleContactService {
+ 	}
+ 
+ 	public function isDefaultContactEnabled(): bool {
+-		return $this->appConfig->getAppValueBool('enableDefaultContact', true);
++		return $this->appConfig->getAppValueBool('enableDefaultContact');
+ 	}
+ 
+ 	public function setDefaultContactEnabled(bool $value): void {
+diff --git a/apps/dav/lib/Service/ExampleEventService.php b/apps/dav/lib/Service/ExampleEventService.php
+--- a/apps/dav/lib/Service/ExampleEventService.php
++++ b/apps/dav/lib/Service/ExampleEventService.php
+@@ -200,6 +200,6 @@ EOF);
+ 	}
+ 
+ 	public function shouldCreateExampleEvent(): bool {
+-		return $this->appConfig->getValueBool(Application::APP_ID, self::ENABLE_CONFIG_KEY, true);
++		return $this->appConfig->getValueBool(Application::APP_ID, self::ENABLE_CONFIG_KEY);
+ 	}
+ }
+

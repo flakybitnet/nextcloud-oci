@@ -1,14 +1,10 @@
 stages:
   - build
+  - package
   - mirror
 
 variables:
   NEXTCLOUD_VERSION: '32.0.11' # https://github.com/nextcloud/server/releases
-  CALENDAR_VERSION: '6.4.2' # https://apps.nextcloud.com/apps/calendar
-  CONTACTS_VERSION: '8.3.12' # https://apps.nextcloud.com/apps/contacts
-  CHECKSUM_VERSION: '2.0.3' # https://apps.nextcloud.com/apps/checksum
-  GROUP_FOLDERS_VERSION: '20.1.14' # https://apps.nextcloud.com/apps/groupfolders
-  NOTIFY_PUSH_VERSION: '1.3.3' # https://apps.nextcloud.com/apps/notify_push
 
 distributives:
   stage: build
@@ -17,46 +13,71 @@ distributives:
       when: never
     - when: on_success
   image: public.ecr.aws/docker/library/debian:trixie-slim
-  variables:
-    GIT_STRATEGY: none
   script:
     - echo 'Updating and installing required system packages and dependencies'
     - apt -qq update
-    - apt install -qq -y wget
+    - apt install -qq -y wget bzip2 gnupg patch
 
+    - echo "Downloading Nextcloud ${NEXTCLOUD_VERSION}"
+    - wget -nv "https://github.com/nextcloud-releases/server/releases/download/v${NEXTCLOUD_VERSION}/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2"
+    - wget -nv "https://github.com/nextcloud-releases/server/releases/download/v${NEXTCLOUD_VERSION}/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2.sha256"
+    - sha256sum -c --ignore-missing "nextcloud-${NEXTCLOUD_VERSION}.tar.bz2.sha256"
+
+    - echo "Verifying signature"
+    - wget -nv "https://github.com/nextcloud-releases/server/releases/download/v${NEXTCLOUD_VERSION}/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2.asc"
+    - gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 28806A878AE423A28372792ED75899B9A724937A
+    - gpg --batch --verify nextcloud-${NEXTCLOUD_VERSION}.tar.bz2.asc nextcloud-${NEXTCLOUD_VERSION}.tar.bz2
+
+    - echo "Extracting archive"
     - mkdir -p dist
+    - tar -jxf "nextcloud-${NEXTCLOUD_VERSION}.tar.bz2" -C dist/
 
-    - echo "Downloading Calendar app ${CALENDAR_VERSION}"
-    - wget -nv "https://github.com/nextcloud-releases/calendar/releases/download/v${CALENDAR_VERSION}/calendar-v${CALENDAR_VERSION}.tar.gz"
-    - tar -zxf "calendar-v${CALENDAR_VERSION}.tar.gz" -C dist/
+    - echo "Preparing distributive for OCI"
+    - rm -rf dist/nextcloud/updater
+    - mkdir -p dist/nextcloud/data
+    - mkdir -p dist/nextcloud/custom_apps
+    - chmod +x dist/nextcloud/occ
 
-    - echo "Downloading Contacts app ${CONTACTS_VERSION}"
-    - wget -nv "https://github.com/nextcloud-releases/contacts/releases/download/v${CONTACTS_VERSION}/contacts-v${CONTACTS_VERSION}.tar.gz"
-    - tar -zxf "contacts-v${CONTACTS_VERSION}.tar.gz" -C dist/
+    - echo "Cleaning up core"
+    - rm -rf dist/nextcloud/core/doc/
+    - rm -rf dist/nextcloud/core/skeleton/Documents/
+    - rm -rf dist/nextcloud/core/skeleton/Photos/
+    - rm -rf dist/nextcloud/core/skeleton/Templates/
+    - rm -rf 'dist/nextcloud/core/skeleton/Nextcloud Manual.pdf'
+    - rm -rf 'dist/nextcloud/core/skeleton/Reasons to use Nextcloud.pdf'
+    - rm -rf 'dist/nextcloud/core/skeleton/Templates credits.md'
 
-    - echo "Downloading Checksum app ${CHECKSUM_VERSION}"
-    - wget -nv "https://github.com/westberliner/checksum/releases/download/v${CHECKSUM_VERSION}/checksum.tar.gz"
-    - tar -zxf "checksum.tar.gz" -C dist/
+    - echo "Cleaning up apps"
+    - rm -rf dist/nextcloud/apps/app_api/
+    - rm -rf dist/nextcloud/apps/dashboard/
+    - rm -rf dist/nextcloud/apps/files_pdfviewer/
+    - rm -rf dist/nextcloud/apps/firstrunwizard/
+    - rm -rf dist/nextcloud/apps/nextcloud_announcements/
+    - rm -rf dist/nextcloud/apps/photos/
+    - rm -rf dist/nextcloud/apps/privacy/
+    - rm -rf dist/nextcloud/apps/recommendations/
+    - rm -rf dist/nextcloud/apps/support/
+    - rm -rf dist/nextcloud/apps/survey_client/
+    - rm -rf dist/nextcloud/apps/suspicious_login/
+    - rm -rf dist/nextcloud/apps/testing/
+    - rm -rf dist/nextcloud/apps/text/
+    - rm -rf dist/nextcloud/apps/updatenotification/
+    - rm -rf dist/nextcloud/apps/weather_status/
+    - rm -rf dist/nextcloud/apps/workflowengine/
 
-    - echo "Downloading Group Folders app ${GROUP_FOLDERS_VERSION}"
-    - wget -nv "https://github.com/nextcloud-releases/groupfolders/releases/download/v${GROUP_FOLDERS_VERSION}/groupfolders-v${GROUP_FOLDERS_VERSION}.tar.gz"
-    - tar -zxf "groupfolders-v${GROUP_FOLDERS_VERSION}.tar.gz" -C dist/
-
-    - echo "Downloading Notify Push app ${NOTIFY_PUSH_VERSION}"
-    - wget -nv "https://github.com/nextcloud-releases/notify_push/releases/download/v${NOTIFY_PUSH_VERSION}/notify_push-v${NOTIFY_PUSH_VERSION}.tar.gz"
-    - tar -zxf "notify_push-v${NOTIFY_PUSH_VERSION}.tar.gz" -C dist/
+    - echo "Applying patches"
+    - cd dist/nextcloud
+    - patch -p 1 -i "$CI_PROJECT_DIR/patches/0001-Disabled-example-event-and-contact-by-default(61259).patch"
   artifacts:
     paths:
       - dist
 
 images:
-  stage: build
+  stage: package
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - when: on_success
-  needs:
-    - distributives
   dependencies:
     - distributives
   image: quay.io/buildah/stable:v1.43.1
@@ -65,10 +86,10 @@ images:
   script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - buildah build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
-        --build-arg NEXTCLOUD_VERSION="$NEXTCLOUD_VERSION"
+      --build-arg NEXTCLOUD_VERSION="$NEXTCLOUD_VERSION"
     - buildah push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
 
-mirror-git-github:
+git-github:
   stage: mirror
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
@@ -79,15 +100,15 @@ mirror-git-github:
   script:
     - git remote add github "https://$GITHUB_USER:$GITHUB_PASSWORD@github.com/flakybitnet/nextcloud-oci.git"
     - if [ -n "${CI_COMMIT_BRANCH-}" ]; then
-        git checkout -b "$CI_COMMIT_BRANCH";
-        git fetch github;
-        git push --force-with-lease github "$CI_COMMIT_BRANCH";
-        fi
+      git checkout -b "$CI_COMMIT_BRANCH";
+      git fetch github;
+      git push --force-with-lease github "$CI_COMMIT_BRANCH";
+      fi
     - if [ -n "${CI_COMMIT_TAG-}" ]; then
-        git push github tag $CI_COMMIT_TAG;
-        fi
+      git push github tag $CI_COMMIT_TAG;
+      fi
 
-mirror-image-github:
+image-github:
   stage: mirror
   rules:
     - if: $CI_COMMIT_TAG
@@ -101,7 +122,7 @@ mirror-image-github:
     - echo "$GITHUB_PASSWORD" | skopeo login -u "$GITHUB_USER" --password-stdin "$REGISTRY"
     - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
 
-mirror-image-quay:
+image-quay:
   stage: mirror
   rules:
     - if: $CI_COMMIT_TAG
@@ -115,7 +136,7 @@ mirror-image-quay:
     - echo "$QUAY_PASSWORD" | skopeo login -u "$QUAY_USER" --password-stdin "$REGISTRY"
     - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
 
-mirror-image-amazon:
+image-amazon:
   stage: mirror
   rules:
     - if: $CI_COMMIT_TAG
@@ -130,4 +151,4 @@ mirror-image-amazon:
   script:
     - printf '{"credHelpers":{"%s":"%s"}}' "$REGISTRY" 'ecr-login' > "$HOME/auth.json"
     - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
-        --dest-authfile="$HOME/auth.json"
+      --dest-authfile="$HOME/auth.json"
