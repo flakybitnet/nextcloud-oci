@@ -3,7 +3,7 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '33.0.3'
+  NEXTCLOUD_VERSION: '33.0.4'
   CALENDAR_VERSION: '6.4.1'
   CONTACTS_VERSION: '8.5.0'
   CHECKSUM_VERSION: '2.1.2'
@@ -91,6 +91,10 @@ images:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - when: on_success
+  needs:
+    - distributives
+  dependencies:
+    - distributives
   image: quay.io/buildah/stable:v1.43.1
   variables:
     STORAGE_DRIVER: 'vfs'
