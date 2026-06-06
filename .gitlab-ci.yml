@@ -3,12 +3,12 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '33.0.4'
-  CALENDAR_VERSION: '6.4.1'
-  CONTACTS_VERSION: '8.5.0'
-  CHECKSUM_VERSION: '2.1.2'
-  GROUP_FOLDERS_VERSION: '21.0.7'
-  NOTIFY_PUSH_VERSION: '1.3.3'
+  NEXTCLOUD_VERSION: '33.0.5'# https://github.com/nextcloud/server/releases
+  CALENDAR_VERSION: '6.4.2' # https://apps.nextcloud.com/apps/calendar
+  CONTACTS_VERSION: '8.5.1' # https://apps.nextcloud.com/apps/contacts
+  CHECKSUM_VERSION: '2.1.2' # https://apps.nextcloud.com/apps/checksum
+  GROUP_FOLDERS_VERSION: '21.0.7' # https://apps.nextcloud.com/apps/groupfolders
+  NOTIFY_PUSH_VERSION: '1.3.3' # https://apps.nextcloud.com/apps/notify_push
   IMAGE_NAME: 'server'
 
 distributives:
