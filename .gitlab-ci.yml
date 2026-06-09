@@ -4,7 +4,6 @@ stages:
 
 variables:
   NEXTCLOUD_VERSION: '32.0.11'
-  IMAGE_NAME: 'server'
 
 images:
   stage: build
@@ -17,9 +16,9 @@ images:
     STORAGE_DRIVER: 'vfs'
   script:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - buildah build -t "$CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_REF_NAME"
+    - buildah build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
         --build-arg NEXTCLOUD_VERSION="$NEXTCLOUD_VERSION"
-    - buildah push "$CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_REF_NAME"
+    - buildah push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
 
 mirror-git-github:
   stage: mirror
@@ -52,7 +51,7 @@ mirror-image-github:
     GIT_STRATEGY: none
   script:
     - echo "$GITHUB_PASSWORD" | skopeo login -u "$GITHUB_USER" --password-stdin "$REGISTRY"
-    - skopeo copy "docker://$CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
+    - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
 
 mirror-image-quay:
   stage: mirror
@@ -66,7 +65,7 @@ mirror-image-quay:
     GIT_STRATEGY: none
   script:
     - echo "$QUAY_PASSWORD" | skopeo login -u "$QUAY_USER" --password-stdin "$REGISTRY"
-    - skopeo copy "docker://$CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
+    - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
 
 mirror-image-amazon:
   stage: mirror
@@ -82,5 +81,5 @@ mirror-image-amazon:
     AWS_SECRET_ACCESS_KEY: $ECR_PASSWORD
   script:
     - printf '{"credHelpers":{"%s":"%s"}}' "$REGISTRY" 'ecr-login' > "$HOME/auth.json"
-    - skopeo copy "docker://$CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
+    - skopeo copy "docker://$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "docker://$REGISTRY/$IMAGE:$CI_COMMIT_REF_NAME"
         --dest-authfile="$HOME/auth.json"
