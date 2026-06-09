@@ -29,3 +29,4 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     apt-get dist-clean
 
+COPY --chown=65534:65534 dist/ /usr/src/nextcloud/apps/
