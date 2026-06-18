@@ -37,6 +37,7 @@ distributives:
     - mkdir -p dist/nextcloud/data
     - mkdir -p dist/nextcloud/custom_apps
     - chmod +x dist/nextcloud/occ
+    - cat htaccess/htaccess >> dist/nextcloud/.htaccess
 
     - echo "Cleaning up core"
     - rm -rf dist/nextcloud/core/doc/
