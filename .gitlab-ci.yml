@@ -4,7 +4,7 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '32.0.11' # https://github.com/nextcloud/server/releases
+  NEXTCLOUD_VERSION: '32.0.12' # https://github.com/nextcloud/server/releases
 
 distributives:
   stage: build
