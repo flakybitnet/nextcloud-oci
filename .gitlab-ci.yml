@@ -64,7 +64,6 @@ distributives:
     - rm -rf dist/nextcloud/apps/text/
     - rm -rf dist/nextcloud/apps/updatenotification/
     - rm -rf dist/nextcloud/apps/weather_status/
-    - rm -rf dist/nextcloud/apps/workflowengine/
 
     - echo "Applying patches"
     - cd dist/nextcloud

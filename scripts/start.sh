@@ -14,13 +14,15 @@ image_version="$(php -r 'require "/var/www/html/version.php"; echo implode(".", 
 # Install
 if [ "$installed_version" = "0.0.0.0" ]; then
     echo "New nextcloud instance"
-    echo "Next step: Access your instance to finish the web-based installation."
+    echo "Next step: Access your instance to finish the web-based installation"
+    echo '---'
 
 # Upgrade
 elif [ "$installed_version" != "$image_version" ]; then
-    echo "Can't start Nextcloud because the version of the data ($installed_version) is different from the docker image version ($image_version)."
-    echo 'Please, run init script or upgrade this instance manually.'
+    echo "Can't start Nextcloud because the version of the data ($installed_version) is different from the docker image version ($image_version)"
+    echo 'Please, run init script or upgrade this instance manually'
     echo 'Waiting 5 minutes'
+    echo '...'
     sleep 300
     exit 1
 fi
