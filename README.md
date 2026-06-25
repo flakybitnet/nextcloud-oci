@@ -2,32 +2,35 @@
 
 Container images of Nextcloud, a safe home for all your data.
 
-This is a superset of [official community images](https://github.com/nextcloud/docker).
-
 ## Goal
 
-Official image doesn't supply `smbclient` required to [SMB/CIFS external storage](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/external_storage/smb.html) 
-work properly - [Issue 1638: smb support unavailable even from "full" image](https://github.com/nextcloud/docker/issues/1638).
-
-So, the goal of the project is to provide the ability to use SMB/CIFS external storage.
-The images also include `ffmpeg` for preview generation.
+To provide a Kubernetes-friendly, read-only capable and relatively slim image.
+In order to render video thumbnails, `ffmpeg` is included also.
 
 ## Images
 
-Images are built on top of the official ones and published in [Quay](https://quay.io/repository/flakybitnet/nextcloud-server), 
-[GHCR](https://github.com/flakybitnet/nextcloud-docker/pkgs/container/nextcloud-server), [AWS](https://gallery.ecr.aws/flakybitnet/nextcloud/server) and [GitLab](https://gitlab.flakybit.net/fb/nextcloud-oci/container_registry) registries.
+Images are available on [Quay](https://quay.io/repository/flakybitnet/nextcloud-server), [GHCR](https://github.com/flakybitnet/nextcloud-docker/pkgs/container/nextcloud-server), [AWS](https://gallery.ecr.aws/flakybitnet/nextcloud/server) and [GitLab](https://gitlab.flakybit.net/fb/nextcloud/server-oci/container_registry) registries.
 
 ## Usage
 
-Usage is not different from [the official images](https://github.com/nextcloud/docker). So, you can run the server by one of the commands:
+Initialize first:
 
 ```
-$ docker run -d -p 8080:80 quay.io/flakybitnet/nextcloud-server
-$ docker run -d -p 8080:80 ghcr.io/flakybitnet/nextcloud-server
-$ docker run -d -p 8080:80 public.ecr.aws/flakybitnet/nextcloud/server
-$ docker run -d -p 8080:80 registry.flakybit.net/fb/nextcloud-oci/server
+$ podman run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data quay.io/flakybitnet/nextcloud-server:<version>
+$ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data ghcr.io/flakybitnet/nextcloud-server:<version>
+$ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data public.ecr.aws/flakybitnet/nextcloud/server:<version>
+$ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data registry.flakybit.net/fb/nextcloud/server-oci:<version>
+```
+
+Then run application:
+
+```
+$ podman run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data quay.io/flakybitnet/nextcloud-server:<version>
+$ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data ghcr.io/flakybitnet/nextcloud-server:<version>
+$ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data public.ecr.aws/flakybitnet/nextcloud/server:<version>
+$ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data registry.flakybit.net/fb/nextcloud/server-oci:<version>
 ```
 
 ## Source
 
-Source code are available at [GitLab](https://gitlab.flakybit.net/fb/nextcloud-oci) and mirrored to [GitHub](https://github.com/flakybitnet/nextcloud-oci).
+Source code are available at [GitLab](https://gitlab.flakybit.net/fb/nextcloud-oci) and mirrored to [GitHub](https://gitlab.flakybit.net/fb/nextcloud/server-oci).
