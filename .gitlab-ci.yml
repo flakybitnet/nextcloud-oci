@@ -4,7 +4,11 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '32.0.12' # https://github.com/nextcloud/server/releases
+  NEXTCLOUD_VERSION: '32.0.13' # https://github.com/nextcloud/server/releases
+  IMG_DEBIAN: 'public.ecr.aws/docker/library/debian:trixie-slim'
+  IMG_BUILDAH: 'quay.io/buildah/stable:v1.43.1'
+  IMG_GIT: 'docker.io/alpine/git:v2.52.0'
+  IMG_SKOPEO: 'public.ecr.aws/flakybitnet/skopeo:1.22.2-fb1'
 
 distributives:
   stage: build
@@ -12,7 +16,7 @@ distributives:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - when: on_success
-  image: public.ecr.aws/docker/library/debian:trixie-slim
+  image: $IMG_DEBIAN
   script:
     - echo 'Updating and installing required system packages and dependencies'
     - apt -qq update
@@ -80,7 +84,7 @@ images:
     - when: on_success
   dependencies:
     - distributives
-  image: quay.io/buildah/stable:v1.43.1
+  image: $IMG_BUILDAH
   variables:
     STORAGE_DRIVER: 'vfs'
   script:
@@ -94,7 +98,7 @@ git-github:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
   dependencies: []
-  image: docker.io/alpine/git:v2.52.0
+  image: $IMG_GIT
   variables:
     GIT_STRATEGY: clone
   script:
@@ -113,7 +117,7 @@ image-github:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.22.2-fb1
+  image: $IMG_SKOPEO
   variables:
     REGISTRY: ghcr.io
     IMAGE: flakybitnet/nextcloud-server
@@ -127,7 +131,7 @@ image-quay:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.22.2-fb1
+  image: $IMG_SKOPEO
   variables:
     REGISTRY: quay.io
     IMAGE: flakybitnet/nextcloud-server
@@ -141,7 +145,7 @@ image-amazon:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: public.ecr.aws/flakybitnet/skopeo:1.22.2-fb1
+  image: $IMG_SKOPEO
   variables:
     REGISTRY: public.ecr.aws
     IMAGE: flakybitnet/nextcloud/server
