@@ -98,7 +98,9 @@ git-github:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
   dependencies: []
-  image: $IMG_GIT
+  image:
+    name: $IMG_GIT
+    entrypoint: [ "" ]
   variables:
     GIT_STRATEGY: clone
   script:
@@ -117,7 +119,9 @@ image-github:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: $IMG_SKOPEO
+  image:
+    name: $IMG_SKOPEO
+    entrypoint: [ "" ]
   variables:
     REGISTRY: ghcr.io
     IMAGE: flakybitnet/nextcloud-server
@@ -131,7 +135,9 @@ image-quay:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: $IMG_SKOPEO
+  image:
+    name: $IMG_SKOPEO
+    entrypoint: [ "" ]
   variables:
     REGISTRY: quay.io
     IMAGE: flakybitnet/nextcloud-server
@@ -145,7 +151,9 @@ image-amazon:
   rules:
     - if: $CI_COMMIT_TAG
   dependencies: []
-  image: $IMG_SKOPEO
+  image:
+    name: $IMG_SKOPEO
+    entrypoint: [ "" ]
   variables:
     REGISTRY: public.ecr.aws
     IMAGE: flakybitnet/nextcloud/server

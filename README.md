@@ -9,7 +9,7 @@ In order to render video thumbnails, `ffmpeg` is included also.
 
 ## Images
 
-Images are available on [Quay](https://quay.io/repository/flakybitnet/nextcloud-server), [GHCR](https://github.com/flakybitnet/nextcloud-docker/pkgs/container/nextcloud-server), [AWS](https://gallery.ecr.aws/flakybitnet/nextcloud/server) and [GitLab](https://gitlab.flakybit.net/fb/nextcloud/server-oci/container_registry) registries.
+Images are available on [Quay](https://quay.io/repository/flakybitnet/nextcloud-server), [GHCR](https://github.com/flakybitnet/nextcloud-oci/pkgs/container/nextcloud-server), [AWS](https://gallery.ecr.aws/flakybitnet/nextcloud/server) and [GitLab](https://gitlab.com/flakybitnet/nextcloud/server-oci/container_registry) registries.
 
 ## Usage
 
@@ -19,7 +19,7 @@ Initialize first:
 $ podman run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data quay.io/flakybitnet/nextcloud-server:<version>
 $ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data ghcr.io/flakybitnet/nextcloud-server:<version>
 $ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data public.ecr.aws/flakybitnet/nextcloud/server:<version>
-$ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data registry.flakybit.net/fb/nextcloud/server-oci:<version>
+$ docker run -d -p 8080:80 --read-only --entrypoint=/bin/nc/init.sh -v config:/var/www/html/config -v data:/var/www/html/data registry.gitlab.com/flakybitnet/nextcloud/server-oci:<version>
 ```
 
 Then run application:
@@ -28,9 +28,9 @@ Then run application:
 $ podman run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data quay.io/flakybitnet/nextcloud-server:<version>
 $ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data ghcr.io/flakybitnet/nextcloud-server:<version>
 $ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data public.ecr.aws/flakybitnet/nextcloud/server:<version>
-$ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data registry.flakybit.net/fb/nextcloud/server-oci:<version>
+$ docker run -d -p 8080:80 --read-only -v config:/var/www/html/config -v data:/var/www/html/data registry.gitlab.com/flakybitnet/nextcloud/server-oci:<version>
 ```
 
 ## Source
 
-Source code are available at [GitLab](https://gitlab.flakybit.net/fb/nextcloud-oci) and mirrored to [GitHub](https://gitlab.flakybit.net/fb/nextcloud/server-oci).
+Source code are available at [GitLab](https://gitlab.com/flakybitnet/nextcloud/server-oci) and mirrored to [GitHub](https://github.com/flakybitnet/nextcloud-oci).
