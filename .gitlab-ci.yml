@@ -4,7 +4,7 @@ stages:
   - mirror
 
 variables:
-  NEXTCLOUD_VERSION: '32.0.13' # https://github.com/nextcloud/server/releases
+  NEXTCLOUD_VERSION: '32.0.14' # https://github.com/nextcloud/server/releases
   IMG_DEBIAN: 'public.ecr.aws/docker/library/debian:trixie-slim'
   IMG_BUILDAH: 'quay.io/buildah/stable:v1.43.1'
   IMG_GIT: 'docker.io/alpine/git:v2.52.0'
